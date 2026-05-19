@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FIA Suitability Intake &middot; F&amp;G Annuities</title>
+<meta name="description" content="Fixed Indexed Annuity client suitability intake with F&G product recommendation." />
+<style>
+  /* ============ Reset & Base ============ */
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    background: #f5f3ef;
+    color: #1c1917;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4 { font-family: "Georgia", "Times New Roman", serif; font-weight: 600; letter-spacing: -0.01em; margin: 0; }
+  h1 { font-size: 2rem; }
+  h2 { font-size: 1.4rem; }
+  h3 { font-size: 1.1rem; }
+  p { margin: 0 0 0.75rem; }
+  small { color: #57534e; }
+
+  /* ============ Layout ============ */
+  .app {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 4rem;
+  }
+  header.brand {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 2px solid #1c1917;
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .brand-title { letter-spacing: -0.02em; }
+  .brand-sub { font-size: 0.85rem; color: #57534e; margin-top: 0.25rem; }
+  .brand-mark {
+    font-family: Georgia, serif;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #44403c;
+    border: 1px solid #1c1917;
+    padding: 0.4rem 0.65rem;
+    background: #fff;
+  }
+
+  /* ============ Progress ============ */
+  .progress {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 1.25rem;
+  }
+  .progress-step {
+    flex: 1;
+    height: 6px;
+    background: #e7e5e4;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .progress-step.active { background: #1c1917; }
+  .progress-step.done   { background: #57534e; }
+  .step-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: #57534e;
+    margin-bottom: 1rem;
+  }
+
+  /* ============ Card ============ */
+  .card {
+    background: #fff;
+    border: 1px solid #d6d3d1;
+    padding: 2rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  }
+  .card h2 { margin-bottom: 0.25rem; }
+  .card .lede { color: #57534e; font-size: 0.95rem; margin-bottom: 1.5rem; }
+
+  /* ============ Form ============ */
+  .grid { display: grid; gap: 1rem; }
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 640px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+  .field { display: flex; flex-direction: column; gap: 0.35rem; }
+  .field.full { grid-column: 1 / -1; }
+  label.lbl {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #44403c;
+  }
+  input[type="text"], input[type="number"], input[type="date"], select, textarea {
+    border: 1px solid #d6d3d1;
+    padding: 0.6rem 0.7rem;
+    font: inherit;
+    background: #fafaf9;
+    color: #1c1917;
+    border-radius: 2px;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: 2px solid #1c1917;
+    outline-offset: -2px;
+    background: #fff;
+  }
+  textarea { min-height: 90px; resize: vertical; }
+  .radio-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .radio-row label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: 1px solid #d6d3d1;
+    padding: 0.45rem 0.75rem;
+    background: #fafaf9;
+    cursor: pointer;
+    font-size: 0.9rem;
+    border-radius: 2px;
+  }
+  .radio-row input[type="radio"] { accent-color: #1c1917; }
+  .radio-row label:has(input:checked) {
+    background: #1c1917;
+    color: #fff;
+    border-color: #1c1917;
+  }
+  .help {
+    font-size: 0.78rem;
+    color: #78716c;
+    margin-top: 0.1rem;
+  }
+
+  /* ============ Buttons ============ */
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+  }
+  button {
+    font: inherit;
+    cursor: pointer;
+    padding: 0.7rem 1.4rem;
+    border: 1px solid #1c1917;
+    background: #1c1917;
+    color: #fff;
+    letter-spacing: 0.05em;
+    border-radius: 2px;
+    transition: all 0.15s;
+  }
+  button.secondary {
+    background: #fff;
+    color: #1c1917;
+  }
+  button.ghost {
+    background: transparent;
+    border-color: #d6d3d1;
+    color: #57534e;
+  }
+  button:hover { opacity: 0.92; }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ============ Results ============ */
+  .verdict {
+    border-left: 6px solid;
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+    background: #fff;
+    border: 1px solid #d6d3d1;
+  }
+  .verdict.pass    { border-left-color: #047857; background: #ecfdf5; }
+  .verdict.caution { border-left-color: #b45309; background: #fffbeb; }
+  .verdict.fail    { border-left-color: #b91c1c; background: #fef2f2; }
+  .verdict-tag {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: #57534e;
+    margin-bottom: 0.25rem;
+  }
+  .verdict-title { font-size: 1.75rem; margin-bottom: 0.5rem; }
+  .verdict.pass .verdict-title    { color: #065f46; }
+  .verdict.caution .verdict-title { color: #92400e; }
+  .verdict.fail .verdict-title    { color: #991b1b; }
+
+  .findings { padding: 0; margin: 0; list-style: none; }
+  .findings li {
+    padding: 0.75rem 1rem;
+    border: 1px solid #e7e5e4;
+    margin-bottom: 0.5rem;
+    display: flex;
+    gap: 0.75rem;
+    background: #fff;
+  }
+  .findings li.pass    { border-left: 4px solid #047857; }
+  .findings li.caution { border-left: 4px solid #b45309; }
+  .findings li.fail    { border-left: 4px solid #b91c1c; }
+  .finding-tag {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    flex-shrink: 0;
+    width: 70px;
+  }
+  .findings li.pass    .finding-tag { color: #047857; }
+  .findings li.caution .finding-tag { color: #b45309; }
+  .findings li.fail    .finding-tag { color: #b91c1c; }
+
+  /* Product recommendation */
+  .product {
+    background: #fff;
+    border: 2px solid #1c1917;
+    padding: 2rem;
+    margin-bottom: 1.25rem;
+  }
+  .product-eyebrow {
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #57534e;
+    margin-bottom: 0.5rem;
+  }
+  .product-name { font-size: 1.75rem; margin-bottom: 0.75rem; }
+  .product-rationale {
+    background: #fafaf9;
+    border-left: 3px solid #1c1917;
+    padding: 0.75rem 1rem;
+    font-style: italic;
+    color: #44403c;
+    margin-bottom: 1rem;
+  }
+  .reasons { padding-left: 1.25rem; margin: 0 0 1rem; }
+  .reasons li { margin-bottom: 0.25rem; color: #292524; }
+  .secondary-rec {
+    font-size: 0.9rem;
+    color: #57534e;
+    padding-top: 0.75rem;
+    border-top: 1px dashed #d6d3d1;
+  }
+
+  /* Summary table */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border: 1px solid #d6d3d1;
+  }
+  @media (max-width: 640px) { .summary-grid { grid-template-columns: 1fr; } }
+  .summary-grid > div {
+    padding: 0.65rem 0.9rem;
+    border-bottom: 1px solid #e7e5e4;
+    font-size: 0.9rem;
+  }
+  .summary-grid > div:nth-child(odd) {
+    background: #fafaf9;
+    font-weight: 600;
+    color: #44403c;
+  }
+
+  .footer-note {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #d6d3d1;
+    font-size: 0.78rem;
+    color: #78716c;
+  }
+
+  /* ============ Print ============ */
+  @media print {
+    body { background: #fff; }
+    .no-print { display: none !important; }
+    .card, .product, .verdict { box-shadow: none; page-break-inside: avoid; }
+    .app { padding: 0; max-width: 100%; }
+    header.brand { border-color: #000; }
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <header class="brand">
+    <div>
+      <h1 class="brand-title">FIA Suitability Intake</h1>
+      <div class="brand-sub">Fixed Indexed Annuity client assessment &middot; F&amp;G product recommendation</div>
+    </div>
+    <div class="brand-mark">F&amp;G&nbsp;Carrier</div>
+  </header>
+
+  <!-- Wizard view -->
+  <div id="wizard">
+    <div class="progress no-print" id="progressBar"></div>
+    <div class="step-label no-print" id="stepLabel"></div>
+    <div id="stepContent"></div>
+    <div class="nav-row no-print">
+      <button class="secondary" id="backBtn">&larr; Back</button>
+      <div style="display:flex; gap:0.5rem;">
+        <button class="ghost" id="resetBtn" type="button">Reset</button>
+        <button id="nextBtn">Next &rarr;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results view -->
+  <div id="results" style="display:none;"></div>
+
+  <div class="footer-note">
+    This tool supports the agent's suitability review and is not a substitute for the carrier's required suitability forms or applicable state replacement disclosures.
+    Always confirm current F&amp;G rates, caps, participation rates, bonus structures, and rider charges from the latest carrier rate sheets before illustrating.
+  </div>
+</div>
+
+<script>
+/* =====================================================
+   Data model & defaults
+   ===================================================== */
+const initialData = {
+  // Step 1: Client
+  clientName: '', spouseName: '', dob: '', spouseDob: '',
+  state: '', maritalStatus: '', dependents: '',
+  employmentStatus: '', occupation: '',
+  // Step 2: Finances
+  annualIncome: '', spouseIncome: '',
+  netWorth: '', liquidNetWorth: '', monthlyExpenses: '',
+  emergencyFund: '', debts: '', taxBracket: '',
+  // Step 3: Funding
+  premiumAmount: '', sourceOfFunds: '', fundsQualified: '',
+  isReplacement: '', existingProduct: '', surrenderCharges: '', replacementReason: '',
+  // Step 4: Objectives
+  primaryObjective: '', incomeStartYears: '', plannedHoldYears: '',
+  legacyImportance: '', growthVsProtection: '',
+  // Step 5: Experience
+  investmentExperience: '', priorAnnuity: '', riskTolerance: '',
+  understandsSurrender: '', understandsCapsPar: '',
+  // Step 6: Other
+  hasLifeInsurance: '', lifeInsuranceAmount: '', hasLTC: '', otherAnnuities: '',
+  agentName: '', agentDate: ''
+};
+
+let data = { ...initialData };
+let step = 0;
+
+const STEPS = [
+  { key: 'client',     title: 'Client Profile',              label: 'Step 1 of 6' },
+  { key: 'finance',    title: 'Financial Profile',           label: 'Step 2 of 6' },
+  { key: 'funding',    title: 'Funding Details',             label: 'Step 3 of 6' },
+  { key: 'objectives', title: 'Objectives & Time Horizon',   label: 'Step 4 of 6' },
+  { key: 'experience', title: 'Experience & Understanding',  label: 'Step 5 of 6' },
+  { key: 'other',      title: 'Insurance & Other Coverage',  label: 'Step 6 of 6' }
+];
+
+/* =====================================================
+   Helpers
+   ===================================================== */
+const $ = (id) => document.getElementById(id);
+const num = (v) => { const n = parseFloat(String(v).replace(/[,$\s]/g,'')); return isNaN(n) ? 0 : n; };
+const fmt$ = (n) => '$' + Math.round(n).toLocaleString();
+const pct = (n) => (n*100).toFixed(0) + '%';
+const ageFromDob = (dob) => {
+  if (!dob) return null;
+  const d = new Date(dob); if (isNaN(d)) return null;
+  const t = new Date(); let a = t.getFullYear() - d.getFullYear();
+  const m = t.getMonth() - d.getMonth();
+  if (m < 0 || (m === 0 && t.getDate() < d.getDate())) a--;
+  return a;
+};
+
+function update(k, v) { data[k] = v; }
+
+/* =====================================================
+   Suitability engine
+   ===================================================== */
+function suitability() {
+  const flags = [];
+  const age = ageFromDob(data.dob);
+  const premium = num(data.premiumAmount);
+  const liquid = num(data.liquidNetWorth);
+  const networth = num(data.netWorth);
+  const monthly = num(data.monthlyExpenses);
+  const emerg = num(data.emergencyFund);
+  const hold = num(data.plannedHoldYears);
+  const incomeStart = num(data.incomeStartYears);
+
+  // Premium vs liquid net worth (most state regs flag > 50%)
+  if (premium && liquid) {
+    const ratio = premium / liquid;
+    if (ratio > 0.50) {
+      flags.push({ type: 'fail', msg: `Premium is ${pct(ratio)} of liquid net worth — exceeds 50% threshold. Document liquidity remaining or reduce premium.` });
+    } else if (ratio > 0.35) {
+      flags.push({ type: 'caution', msg: `Premium is ${pct(ratio)} of liquid net worth — high concentration. Confirm sufficient remaining liquidity.` });
+    } else {
+      flags.push({ type: 'pass', msg: `Premium is ${pct(ratio)} of liquid net worth — within reasonable concentration limits.` });
+    }
+  }
+
+  // Premium vs total net worth
+  if (premium && networth) {
+    const r = premium / networth;
+    if (r > 0.50) flags.push({ type: 'fail', msg: `Premium is ${pct(r)} of total net worth — exceeds typical 50% cap.` });
+  }
+
+  // Emergency fund
+  if (emerg && monthly) {
+    const months = emerg / monthly;
+    if (months < 3) flags.push({ type: 'fail', msg: `Emergency fund covers only ${months.toFixed(1)} months of expenses — below 3-month minimum. Build reserves before annuitizing.` });
+    else if (months < 6) flags.push({ type: 'caution', msg: `Emergency fund covers ${months.toFixed(1)} months — below 6-month best practice.` });
+    else flags.push({ type: 'pass', msg: `Emergency fund covers ${months.toFixed(1)} months of expenses — adequate.` });
+  }
+
+  // Age vs typical 10-yr surrender
+  if (age != null) {
+    if (age >= 80) flags.push({ type: 'fail', msg: `Client age ${age} — most F&G FIAs have issue age limits at or near 80. Confirm product eligibility.` });
+    else if (age >= 75) flags.push({ type: 'caution', msg: `Client age ${age} — surrender period may extend past life expectancy. Document liquidity and legacy plan.` });
+    else if (age >= 70) flags.push({ type: 'caution', msg: `Client age ${age} — verify 10-year surrender aligns with goals and beneficiary plan.` });
+  }
+
+  // Time horizon vs surrender
+  if (hold && hold < 7) {
+    flags.push({ type: 'fail', msg: `Planned hold (${hold} yrs) is shorter than the typical 10-year surrender schedule.` });
+  } else if (hold && hold < 10) {
+    flags.push({ type: 'caution', msg: `Planned hold (${hold} yrs) is shorter than the typical 10-year surrender — confirm free withdrawal access is enough.` });
+  }
+
+  // Replacement
+  if (data.isReplacement === 'yes') {
+    const surr = num(data.surrenderCharges);
+    if (surr > premium * 0.05) {
+      flags.push({ type: 'caution', msg: `Replacement surrender charges of ${fmt$(surr)} — net benefit must clearly outweigh cost. Complete replacement comparison.` });
+    } else if (surr === 0) {
+      flags.push({ type: 'pass', msg: `Replacement with no surrender exposure — document benefit comparison.` });
+    } else {
+      flags.push({ type: 'pass', msg: `Replacement with minimal surrender exposure (${fmt$(surr)}) — document benefit comparison.` });
+    }
+  }
+
+  // Understanding
+  if (data.understandsSurrender === 'no' || data.understandsCapsPar === 'no') {
+    flags.push({ type: 'fail', msg: `Client has not confirmed understanding of surrender schedule and/or caps/participation rates. Re-educate before proceeding.` });
+  } else if (data.understandsSurrender === 'yes' && data.understandsCapsPar === 'yes') {
+    flags.push({ type: 'pass', msg: `Client confirms understanding of surrender schedule and crediting mechanics.` });
+  }
+
+  // Risk tolerance vs objective
+  if (data.riskTolerance === 'aggressive' && data.primaryObjective === 'protection') {
+    flags.push({ type: 'caution', msg: `Risk tolerance "aggressive" conflicts with "principal protection" objective — clarify priorities.` });
+  }
+  if (data.riskTolerance === 'conservative' && data.primaryObjective === 'accumulation') {
+    flags.push({ type: 'caution', msg: `Risk tolerance "conservative" with "growth" objective — confirm client accepts capped FIA returns.` });
+  }
+
+  // Qualified funds + replacement
+  if (data.fundsQualified === 'yes' && data.isReplacement === 'yes') {
+    flags.push({ type: 'caution', msg: `Qualified-money replacement — confirm 1035 / trustee-to-trustee handling and document required minimum distribution impact.` });
+  }
+
+  // Determine overall level
+  const hasFail = flags.some(f => f.type === 'fail');
+  const hasCaution = flags.some(f => f.type === 'caution');
+  let level = 'pass';
+  if (hasFail) level = 'fail';
+  else if (hasCaution) level = 'caution';
+
+  return { level, flags, age };
+}
+
+/* =====================================================
+   F&G Product recommendation engine
+   ===================================================== */
+function recommend(verdict) {
+  if (verdict.level === 'fail') {
+    return {
+      blocked: true,
+      product: '— Recommendation Withheld —',
+      rationale: 'Suitability concerns must be resolved before recommending a product. Address the flagged items above and re-run the assessment.',
+      reasons: [],
+      secondary: ''
+    };
+  }
+  const age = verdict.age || 0;
+  const obj = data.primaryObjective;
+  const incomeStart = num(data.incomeStartYears);
+  const hold = num(data.plannedHoldYears);
+  const risk = data.riskTolerance;
+  const legacy = data.legacyImportance;
+
+  // INCOME-FOCUSED CLIENTS
+  if (obj === 'income') {
+    // Near-term income, age 55-80 → Safe Income Advantage
+    if (incomeStart <= 10 && age >= 50 && age <= 80) {
+      return {
+        product: 'F&G Safe Income Advantage',
+        rationale: `Income objective with a ${incomeStart || '5–10'}-year income start window is a textbook fit for Safe Income Advantage's GLWB roll-up structure.`,
+        reasons: [
+          `Primary objective: guaranteed lifetime income`,
+          `Age ${age} fits SIA's 45–80 issue band`,
+          `${incomeStart || '5–10'} years to income start allows roll-up period to compound`,
+          `Level, increasing, or inflation-linked payout options available`,
+          `Principal protected during deferral; 10% free withdrawal after year 1`
+        ],
+        secondary: 'If the client wants higher accumulation potential during the deferral and may delay income further, consider F&G Accelerator Plus with an income rider as a hybrid.'
+      };
+    }
+    // Longer deferral (10+ yrs) or younger → Accelerator Plus with income rider
+    if (incomeStart > 10 || (age < 60 && obj === 'income')) {
+      return {
+        product: 'F&G Accelerator Plus 10',
+        rationale: `Long deferral horizon (${incomeStart || '10+'} yrs) favors a bonus + income rider combination that accumulates aggressively before turning on income.`,
+        reasons: [
+          `Premium bonus enhances income base from day one`,
+          `Optional GLWB rider builds a separate income value through roll-up`,
+          `Longer ${incomeStart || '10+'}-year deferral maximizes roll-up benefit`,
+          `Multiple index strategies for upside during deferral`,
+          `Suitable for clients still in accumulation but planning future income`
+        ],
+        secondary: 'F&G Safe Income Advantage is the alternative if the client is closer to income start (within 10 years) and wants the simpler GLWB structure.'
+      };
+    }
+  }
+
+  // ACCUMULATION-FOCUSED CLIENTS
+  if (obj === 'accumulation' || obj === 'growth') {
+    // Younger, aggressive, longer horizon → Performance Pro
+    if ((risk === 'aggressive' || risk === 'moderate-aggressive') && hold >= 10) {
+      return {
+        product: 'F&G Performance Pro',
+        rationale: `Growth-oriented client with a ${hold}-year horizon benefits most from Performance Pro's premium bonus and uncapped crediting strategies.`,
+        reasons: [
+          `Premium bonus up to 17% boosts starting account value`,
+          `Multiple index strategies including uncapped participation options`,
+          `Hold horizon of ${hold} years aligns with the surrender schedule`,
+          `${risk} risk tolerance matches Performance Pro's growth profile`,
+          `Principal protection retained alongside accumulation upside`
+        ],
+        secondary: 'If the client values index diversification over the upfront bonus, F&G Power Accumulator offers nine index strategies with a similar growth focus.'
+      };
+    }
+    // Moderate, conservative, broad index choice → Power Accumulator
+    if (risk === 'conservative' || risk === 'moderate' || hold < 10) {
+      return {
+        product: 'F&G Power Accumulator',
+        rationale: `Moderate/conservative client wants accumulation with breadth of index choice and a manageable surrender window.`,
+        reasons: [
+          `Nine indexed strategies plus a fixed account — more diversification than most FIAs`,
+          `Available with 7- or 10-year surrender to match planned hold (${hold} yrs)`,
+          `${risk} risk tolerance fits the steady, diversified crediting design`,
+          `Strong accumulation without giving up principal protection`,
+          `10% annual free withdrawal preserves liquidity`
+        ],
+        secondary: 'If maximum upside with a premium bonus matters more than diversification, F&G Performance Pro is the stronger alternative.'
+      };
+    }
+  }
+
+  // LEGACY-FOCUSED — checked before protection so a high-legacy protection-minded
+  // client gets routed to the bonus + death benefit product.
+  if (legacy === 'high') {
+    return {
+      product: 'F&G Prosperity Elite',
+      rationale: `Legacy is the primary driver — Prosperity Elite's premium bonus plus death benefit features positions the account value for heirs.`,
+      reasons: [
+        `Premium bonus increases the account value heirs receive`,
+        `Standard waivers cover nursing home and terminal illness events`,
+        `Multiple crediting strategies for growth during the deferral period`,
+        `Account value (not just surrender value) typically passes to beneficiaries`,
+        `Aligns with a "use it for legacy, don't draw it down" plan`
+      ],
+      secondary: 'If income later becomes part of the legacy plan, Accelerator Plus 10 with an income rider can shift between income and legacy goals.'
+    };
+  }
+
+  // PROTECTION / PRESERVATION
+  if (obj === 'protection') {
+    return {
+      product: 'F&G Power Accumulator',
+      rationale: `Protection-first client wants principal preservation with modest, predictable growth and broad strategy choice.`,
+      reasons: [
+        `Principal protected from market loss`,
+        `Conservative crediting strategies available within Power Accumulator's lineup`,
+        `Fixed account option provides a known floor on growth`,
+        `${hold}-year hold aligns with surrender schedule`,
+        `Penalty-free withdrawals after year 1 preserve flexibility`
+      ],
+      secondary: 'For protection clients who also prioritize legacy, F&G Prosperity Elite is the bonus-rich alternative if legacy positioning matters more than accumulation.'
+    };
+  }
+
+  // Fallback
+  return {
+    product: 'F&G Performance Pro',
+    rationale: `Profile is workable but does not map cleanly to a single product. Performance Pro is a flexible default — revisit the recommendation as objectives sharpen.`,
+    reasons: [
+      `Premium bonus provides upfront account value lift`,
+      `Multiple index strategies support both growth and balanced approaches`,
+      `Can be paired with an optional income rider if income later becomes the goal`,
+      `Suitable across moderate-to-aggressive risk profiles`
+    ],
+    secondary: 'Re-run the assessment once the primary objective and time horizon are clearer; consider Safe Income Advantage for income or Power Accumulator for conservative accumulation.'
+  };
+}
+
+/* =====================================================
+   Step renderers
+   ===================================================== */
+function renderStep() {
+  const cur = STEPS[step];
+  $('stepLabel').textContent = cur.label;
+
+  // Progress bar
+  let bar = '';
+  for (let i = 0; i < STEPS.length; i++) {
+    const cls = i < step ? 'done' : (i === step ? 'active' : '');
+    bar += `<div class="progress-step ${cls}" data-step="${i}" title="${STEPS[i].title}"></div>`;
+  }
+  $('progressBar').innerHTML = bar;
+  $('progressBar').querySelectorAll('.progress-step').forEach(el => {
+    el.addEventListener('click', () => { step = parseInt(el.dataset.step); renderStep(); });
+  });
+
+  // Step content
+  const fns = { client: renderClient, finance: renderFinance, funding: renderFunding, objectives: renderObjectives, experience: renderExperience, other: renderOther };
+  $('stepContent').innerHTML = fns[cur.key]();
+  bindFields();
+
+  // Buttons
+  $('backBtn').disabled = step === 0;
+  $('nextBtn').textContent = step === STEPS.length - 1 ? 'Generate Recommendation →' : 'Next →';
+}
+
+function fieldText(key, label, ph = '', type = 'text') {
+  return `<div class="field">
+    <label class="lbl" for="f_${key}">${label}</label>
+    <input id="f_${key}" data-field="${key}" type="${type}" value="${data[key] || ''}" placeholder="${ph}" />
+  </div>`;
+}
+function fieldArea(key, label, ph = '') {
+  return `<div class="field full">
+    <label class="lbl" for="f_${key}">${label}</label>
+    <textarea id="f_${key}" data-field="${key}" placeholder="${ph}">${data[key] || ''}</textarea>
+  </div>`;
+}
+function fieldSelect(key, label, opts) {
+  let o = `<option value="">— select —</option>`;
+  opts.forEach(([v, t]) => { o += `<option value="${v}" ${data[key]===v?'selected':''}>${t}</option>`; });
+  return `<div class="field">
+    <label class="lbl" for="f_${key}">${label}</label>
+    <select id="f_${key}" data-field="${key}">${o}</select>
+  </div>`;
+}
+function fieldRadio(key, label, opts, help='') {
+  let r = '';
+  opts.forEach(([v, t]) => {
+    r += `<label><input type="radio" name="${key}" data-field="${key}" value="${v}" ${data[key]===v?'checked':''}/> ${t}</label>`;
+  });
+  return `<div class="field full">
+    <label class="lbl">${label}</label>
+    <div class="radio-row">${r}</div>
+    ${help ? `<div class="help">${help}</div>` : ''}
+  </div>`;
+}
+
+function renderClient() {
+  return `
+    <div class="card">
+      <h2>Client Profile</h2>
+      <p class="lede">Basic identifying and household information.</p>
+      <div class="grid grid-2">
+        ${fieldText('clientName', 'Client Full Name', 'Jane A. Doe')}
+        ${fieldText('dob', 'Date of Birth', '', 'date')}
+        ${fieldText('spouseName', 'Spouse Name (if applicable)', 'Optional')}
+        ${fieldText('spouseDob', 'Spouse DOB', '', 'date')}
+        ${fieldText('state', 'State of Residence', 'e.g. FL')}
+        ${fieldSelect('maritalStatus', 'Marital Status', [
+          ['single','Single'],['married','Married'],['widowed','Widowed'],['divorced','Divorced']
+        ])}
+        ${fieldText('dependents', 'Dependents', '0')}
+        ${fieldSelect('employmentStatus', 'Employment Status', [
+          ['employed','Employed'],['self-employed','Self-employed'],['retired','Retired'],['unemployed','Unemployed']
+        ])}
+        ${fieldText('occupation', 'Occupation', 'e.g. Retired teacher')}
+      </div>
+    </div>`;
+}
+
+function renderFinance() {
+  return `
+    <div class="card">
+      <h2>Financial Profile</h2>
+      <p class="lede">Income, net worth, liquidity, and obligations.</p>
+      <div class="grid grid-2">
+        ${fieldText('annualIncome', 'Annual Income', '$')}
+        ${fieldText('spouseIncome', 'Spouse Income', '$')}
+        ${fieldText('netWorth', 'Total Net Worth', '$')}
+        ${fieldText('liquidNetWorth', 'Liquid Net Worth', '$ (excluding real estate, retirement-locked assets)')}
+        ${fieldText('monthlyExpenses', 'Monthly Expenses', '$')}
+        ${fieldText('emergencyFund', 'Emergency Fund', '$ (cash & cash equivalents)')}
+        ${fieldText('debts', 'Outstanding Debts', '$ (excluding mortgage if not relevant)')}
+        ${fieldSelect('taxBracket', 'Federal Tax Bracket', [
+          ['10','10%'],['12','12%'],['22','22%'],['24','24%'],['32','32%'],['35','35%'],['37','37%']
+        ])}
+      </div>
+    </div>`;
+}
+
+function renderFunding() {
+  return `
+    <div class="card">
+      <h2>Funding Details</h2>
+      <p class="lede">Premium amount, source, and any replacement context.</p>
+      <div class="grid grid-2">
+        ${fieldText('premiumAmount', 'Premium Amount', '$')}
+        ${fieldSelect('sourceOfFunds', 'Source of Funds', [
+          ['savings','Savings / CDs'],['brokerage','Taxable brokerage'],['ira','IRA / 401(k) rollover'],
+          ['existing-annuity','Existing annuity'],['inheritance','Inheritance'],['real-estate','Real estate proceeds'],['other','Other']
+        ])}
+        ${fieldRadio('fundsQualified', 'Qualified or Non-Qualified Funds?', [
+          ['yes','Qualified (pre-tax)'],['no','Non-Qualified (after-tax)']
+        ])}
+        ${fieldRadio('isReplacement', 'Is this a replacement of an existing annuity / life policy?', [
+          ['yes','Yes'],['no','No']
+        ])}
+      </div>
+      <div id="replacementSection" style="display:${data.isReplacement === 'yes' ? 'block' : 'none'}; margin-top:1rem;">
+        <div class="grid grid-2">
+          ${fieldText('existingProduct', 'Existing Carrier / Product', 'e.g. Allianz 222')}
+          ${fieldText('surrenderCharges', 'Surrender Charges on Existing', '$')}
+          ${fieldArea('replacementReason', 'Reason for Replacement', 'Better income, lower fees, etc.')}
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderObjectives() {
+  return `
+    <div class="card">
+      <h2>Objectives & Time Horizon</h2>
+      <p class="lede">What is the money for, and over what timeframe?</p>
+      <div class="grid grid-2">
+        ${fieldSelect('primaryObjective', 'Primary Objective', [
+          ['income','Guaranteed lifetime income'],
+          ['accumulation','Tax-deferred accumulation / growth'],
+          ['protection','Principal protection'],
+          ['legacy','Legacy / wealth transfer']
+        ])}
+        ${fieldText('incomeStartYears', 'Years Until Income Start', 'e.g. 5')}
+        ${fieldText('plannedHoldYears', 'Planned Holding Period (years)', 'e.g. 10')}
+        ${fieldSelect('legacyImportance', 'Legacy Importance', [
+          ['low','Low — spend in lifetime'],['medium','Medium — some legacy'],['high','High — primary goal']
+        ])}
+        ${fieldSelect('growthVsProtection', 'Growth vs. Protection Preference', [
+          ['protection','Strongly favor protection'],
+          ['balanced','Balanced'],
+          ['growth','Strongly favor growth']
+        ])}
+      </div>
+    </div>`;
+}
+
+function renderExperience() {
+  return `
+    <div class="card">
+      <h2>Experience & Understanding</h2>
+      <p class="lede">Investor experience and confirmation that mechanics are understood.</p>
+      <div class="grid grid-2">
+        ${fieldSelect('investmentExperience', 'Investment Experience', [
+          ['none','None'],['limited','Limited'],['moderate','Moderate'],['extensive','Extensive']
+        ])}
+        ${fieldRadio('priorAnnuity', 'Has owned annuities before?', [['yes','Yes'],['no','No']])}
+        ${fieldSelect('riskTolerance', 'Risk Tolerance', [
+          ['conservative','Conservative'],['moderate','Moderate'],['moderate-aggressive','Moderate-Aggressive'],['aggressive','Aggressive']
+        ])}
+      </div>
+      <div style="margin-top:1rem;">
+        ${fieldRadio('understandsSurrender', 'Client understands the surrender charge schedule and that early withdrawal beyond free-withdrawal limits incurs charges.', [['yes','Yes — confirmed'],['no','No — needs re-education']])}
+        ${fieldRadio('understandsCapsPar', 'Client understands caps, participation rates, and that FIA returns are not direct market participation.', [['yes','Yes — confirmed'],['no','No — needs re-education']])}
+      </div>
+    </div>`;
+}
+
+function renderOther() {
+  return `
+    <div class="card">
+      <h2>Insurance & Other Coverage</h2>
+      <p class="lede">Existing protections and other annuities.</p>
+      <div class="grid grid-2">
+        ${fieldRadio('hasLifeInsurance', 'Has Life Insurance?', [['yes','Yes'],['no','No']])}
+        ${fieldText('lifeInsuranceAmount', 'Life Insurance Face Amount', '$')}
+        ${fieldRadio('hasLTC', 'Has Long-Term Care Coverage?', [['yes','Yes'],['no','No']])}
+        ${fieldText('agentName', 'Agent Name', 'For the file')}
+        ${fieldText('agentDate', 'Date of Review', '', 'date')}
+      </div>
+      ${fieldArea('otherAnnuities', 'Other Annuities Owned', 'Carrier, product, value, surrender period remaining...')}
+    </div>`;
+}
+
+/* =====================================================
+   Binding
+   ===================================================== */
+function bindFields() {
+  document.querySelectorAll('[data-field]').forEach(el => {
+    const k = el.dataset.field;
+    const ev = el.type === 'radio' || el.tagName === 'SELECT' ? 'change' : 'input';
+    el.addEventListener(ev, () => {
+      const v = el.type === 'radio' ? (el.checked ? el.value : data[k]) : el.value;
+      update(k, v);
+      // Re-render replacement section toggle
+      if (k === 'isReplacement') {
+        const sec = $('replacementSection');
+        if (sec) sec.style.display = v === 'yes' ? 'block' : 'none';
+      }
+    });
+  });
+}
+
+/* =====================================================
+   Results
+   ===================================================== */
+function renderResults() {
+  const v = suitability();
+  const r = recommend(v);
+  const age = v.age;
+
+  const findings = v.flags.length
+    ? v.flags.map(f => `<li class="${f.type}"><span class="finding-tag">${f.type}</span><span>${f.msg}</span></li>`).join('')
+    : `<li class="pass"><span class="finding-tag">pass</span><span>No suitability findings raised. Document and proceed.</span></li>`;
+
+  const reasonsHtml = r.reasons.length
+    ? `<ul class="reasons">${r.reasons.map(x => `<li>${x}</li>`).join('')}</ul>`
+    : '';
+
+  const summaryRows = [
+    ['Client', data.clientName || '—'],
+    ['Age', age != null ? age : '—'],
+    ['State', data.state || '—'],
+    ['Primary Objective', labelize(data.primaryObjective)],
+    ['Risk Tolerance', labelize(data.riskTolerance)],
+    ['Premium', data.premiumAmount ? fmt$(num(data.premiumAmount)) : '—'],
+    ['Liquid Net Worth', data.liquidNetWorth ? fmt$(num(data.liquidNetWorth)) : '—'],
+    ['Years to Income', data.incomeStartYears || '—'],
+    ['Hold Period', data.plannedHoldYears ? data.plannedHoldYears + ' yrs' : '—'],
+    ['Replacement?', labelize(data.isReplacement)],
+    ['Source of Funds', labelize(data.sourceOfFunds)],
+    ['Agent', data.agentName || '—']
+  ];
+
+  const verdictLine = {
+    pass: ['Suitable to Proceed', 'Profile meets standard suitability thresholds. Document the file and proceed with the recommended product.'],
+    caution: ['Proceed with Documentation', 'Profile is workable but flagged items need written justification and client acknowledgment before submission.'],
+    fail: ['Not Suitable as Structured', 'One or more hard constraints failed. Restructure the recommendation or address the flagged issues before submitting.']
+  }[v.level];
+
+  $('results').innerHTML = `
+    <div class="verdict ${v.level}">
+      <div class="verdict-tag">Suitability Determination</div>
+      <div class="verdict-title">${verdictLine[0]}</div>
+      <div>${verdictLine[1]}</div>
+    </div>
+
+    <div class="card">
+      <h3>Client Summary</h3>
+      <div class="summary-grid">
+        ${summaryRows.map(([l,vv]) => `<div>${l}</div><div>${vv}</div>`).join('')}
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Suitability Findings</h3>
+      <ul class="findings">${findings}</ul>
+    </div>
+
+    <div class="product">
+      <div class="product-eyebrow">${r.blocked ? 'Recommendation' : 'F&G FIA Recommendation'}</div>
+      <div class="product-name">${r.product}</div>
+      <div class="product-rationale">${r.rationale}</div>
+      ${reasonsHtml}
+      ${r.secondary ? `<div class="secondary-rec"><strong>Alternative:</strong> ${r.secondary}</div>` : ''}
+    </div>
+
+    <div class="card">
+      <h3>Next Steps</h3>
+      <ol>
+        <li>Review the suitability findings with the client and obtain written acknowledgment of any caution items.</li>
+        <li>Confirm current F&amp;G rate sheets — caps, participation rates, bonus percentages, rider charges — before illustrating.</li>
+        <li>Generate the F&amp;G illustration and walk through the recommended product side-by-side with the client.</li>
+        <li>Complete the F&amp;G suitability form and, if a replacement, the applicable state replacement form (NY Reg 60, NJ AC 11:4-44, FL DFS-H1-1980, etc.).</li>
+        <li>Submit the application with all signed disclosures and a copy of this intake retained in the client file.</li>
+      </ol>
+    </div>
+
+    <div class="nav-row no-print">
+      <button class="secondary" id="editBtn">&larr; Edit Inputs</button>
+      <div style="display:flex; gap:0.5rem;">
+        <button class="ghost" id="exportBtn">Save JSON</button>
+        <button id="printBtn">Print / Save PDF</button>
+      </div>
+    </div>
+  `;
+
+  $('editBtn').addEventListener('click', showWizard);
+  $('printBtn').addEventListener('click', () => window.print());
+  $('exportBtn').addEventListener('click', exportJson);
+}
+
+function labelize(v) {
+  if (!v) return '—';
+  return v.replace(/-/g,' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+/* =====================================================
+   View switching
+   ===================================================== */
+function showWizard() {
+  $('wizard').style.display = '';
+  $('results').style.display = 'none';
+  renderStep();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function showResults() {
+  $('wizard').style.display = 'none';
+  $('results').style.display = '';
+  renderResults();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* =====================================================
+   Persistence
+   ===================================================== */
+function save() {
+  try { localStorage.setItem('fia_intake_v1', JSON.stringify(data)); } catch(e) {}
+}
+function load() {
+  try {
+    const s = localStorage.getItem('fia_intake_v1');
+    if (s) data = { ...initialData, ...JSON.parse(s) };
+  } catch(e) {}
+}
+function exportJson() {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `FIA_Intake_${(data.clientName||'client').replace(/\s+/g,'_')}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+
+/* =====================================================
+   Wire up nav
+   ===================================================== */
+$('nextBtn').addEventListener('click', () => {
+  save();
+  if (step < STEPS.length - 1) { step++; renderStep(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+  else { showResults(); }
+});
+$('backBtn').addEventListener('click', () => {
+  if (step > 0) { step--; renderStep(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+});
+$('resetBtn').addEventListener('click', () => {
+  if (confirm('Clear all inputs and start a new intake?')) {
+    data = { ...initialData };
+    try { localStorage.removeItem('fia_intake_v1'); } catch(e) {}
+    step = 0; renderStep();
+  }
+});
+
+// Autosave on input
+document.addEventListener('input', save);
+document.addEventListener('change', save);
+
+// Init
+load();
+renderStep();
+</script>
+</body>
+</html>
